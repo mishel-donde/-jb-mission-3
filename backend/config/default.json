@@ -1,7 +1,7 @@
 {
   "app": {
-    "port": "3000",
-    "name": "name",
+    "port": "3005",
+    "name": "teams meetings",
     "secret": "MySecret",
     "jwtSecret": "MyJwtSecret"
   },
@@ -10,7 +10,7 @@
     "port": 3306,
     "username": "root",
     "password": "",
-    "database": "name"
+    "database": "teams_meetings"
   },
   "sequelize": {
     "logging": true,
