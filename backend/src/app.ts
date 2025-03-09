@@ -1,54 +1,38 @@
-import express, { json } from "express"
-import config from 'config'
-import sequelize from "./db/sequelize"
-import profileRouter from "./routers/profile"
-import followsRouter from "./routers/follows"
-import commentsRouter from "./routers/comments"
-import feedRouter from "./routers/feed"
-import authRouter from "./routers/auth"
-import errorLogger from "./middlewares/error/error-logger"
-import errorResponder from "./middlewares/error/error-responder"
-import notFound from "./middlewares/not-found"
-import enforceAuth from "./middlewares/enforce-auth"
-import cors from 'cors'
-import fileUpload from "express-fileupload"
+import express, { json } from "express";
+import config from "config";
+import sequelize from "./db/sequelize"; // ניהול החיבור למסד נתונים עם Sequelize
+import errorLogger from "./middlewares/error/error-logger"; // Middleware לטיפול בשגיאות ויצירת לוגים
+import errorResponder from "./middlewares/error/error-responder"; // Middleware לתגובה כשיש שגיאות
+import notFound from "./middlewares/not-found"; // Middleware לטיפול במקרה של URL לא קיים
+import cors from "cors"; // Middleware לניהול CORS
+import teamsRouter from "./routers/teams"; // ניהול קריאות אל ה-router של הקבוצות
+import meetingsRouter from "./routers/meetingss"; // ניהול קריאות אל ה-router של הפגישות
 
-const port = config.get<string>('app.port')
-const name = config.get<string>('app.name')
-const force = config.get<boolean>('sequelize.sync.force')
+const port = config.get<string>("app.port");
+const name = config.get<string>("app.name");
+const force = config.get<boolean>("sequelize.sync.force");
 
 const app = express();
 
 (async () => {
-    await sequelize.sync({ force })
+  try {
+    await sequelize.sync({ force });
 
     // middlewares
-    app.use(cors()) // allow any client to use this server
+    app.use(cors());
+    app.use(json());
+    // Mounting Routers
+    app.use("/teams", teamsRouter);
+    app.use("/meetings", meetingsRouter);
 
-    // allow cors from a single specific client:
-    // app.use(cors({
-    //     origin: 'http://localhost:5173'
-    // }))
+    app.use(notFound);
 
-    // allow cors from a list of clients:
-    // app.use(cors({
-    //     origin: ['http://localhost:5173', 'https://google.com']
-    // }))
-    app.use(json()) // a middleware to extract the post/put/patch data and save it to the request object in case the content type of the request is application/json
-    app.use(fileUpload())
+    app.use(errorLogger);
+    app.use(errorResponder);
 
-    app.use('/auth', authRouter)
-    app.use('/profile', profileRouter)
-    app.use('/follows', followsRouter)
-    app.use('/comments', commentsRouter)
-    app.use('/feed', feedRouter)
-
-    // special notFound middleware
-    app.use(notFound)
-
-    // error middleware
-    app.use(errorLogger)
-    app.use(errorResponder)
-
-    app.listen(port, () => console.log(`${name} started on port ${port}...`))
-})()
+    app.listen(port, () => console.log(`${name} started on port ${port}...`));
+  } catch (error) {
+    console.error("Error during initialization:", error);
+    process.exit(1);
+  }
+})();

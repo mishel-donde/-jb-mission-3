@@ -1,34 +1,32 @@
-import { NavLink } from 'react-router-dom'
-import './Header.css'
-import useUsername from '../../../hooks/useUsername'
-import { useContext } from 'react'
-import { AuthContext } from '../../auth/auth/Auth'
+import { NavLink } from "react-router-dom";
+import "./Header.css"; // כולל את הקובץ CSS
 
 export default function Header() {
-
-    const name = useUsername()
-
-    const { logout } = useContext(AuthContext)!
-
-    function logMeOut() {
-        logout()
-    }
-
-    return (
-        <div className='Header'>
-            <div>
-                Logo
-            </div>  
-            <div>
-                <nav>
-                    <NavLink to="/profile">profile</NavLink>
-                    <NavLink to="/feed">feed</NavLink>
-                    <NavLink to="/search">search</NavLink>
-                </nav>
-            </div>          
-            <div>
-                Hello {name} | <button onClick={logMeOut}>logout</button>
-            </div>
-        </div>
-    )
+  return (
+    <div className="header">
+      <div className="logo">Development App</div> {/* המקום ל-Logo */}
+      <div className="navigation">
+        <nav>
+          <NavLink
+            to="/teams"
+            className={({ isActive }) => (isActive ? "active-link" : "")}
+          >
+            Development Teams
+          </NavLink>
+          <NavLink
+            to="/meetings"
+            className={({ isActive }) => (isActive ? "active-link" : "")}
+          >
+            Meetings
+          </NavLink>
+          <NavLink
+            to="/add-meeting"
+            className={({ isActive }) => (isActive ? "active-link" : "")}
+          >
+            Add Meeting
+          </NavLink>
+        </nav>
+      </div>
+    </div>
+  );
 }
